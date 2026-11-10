@@ -1,0 +1,141 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "f60250ac-37cf-4264-a83b-0a3ece5c158a",
+              "leftValue": "={{ $json.snippet }}",
+              "rightValue": "damaged",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "0f5dcdf6-8074-4c88-9a64-9e2fb71152b2",
+      "name": "check damaged"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c128acd1-ae1b-4de5-a971-3a852d66bd94",
+              "name": "response_body",
+              "value": "We're sorry your product arrived damaged. We understand the inconvenience. We've received your replacement request and our support team will assist you shortly.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "a4624733-250a-4161-9949-b7cffc47e233",
+      "name": "replacement reply"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        -96
+      ],
+      "id": "85d4654d-5f82-4a80-9d8a-e2829829bfa9",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.response_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "907055a1-5245-4df4-afc5-97de12f5716d",
+      "name": "Reply to a message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "check damaged": {
+      "main": [
+        [
+          {
+            "node": "replacement reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "check damaged",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "replacement reply": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
